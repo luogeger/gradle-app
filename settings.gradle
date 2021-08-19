@@ -1,2 +1,7 @@
+// 该文件是用来管理多项目构建的
+
 rootProject.name = 'gradle-app'
+include 'model'
+include 'repository'
+include 'web'
 

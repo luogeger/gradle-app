@@ -1,0 +1,11 @@
+
+//  可以这样使用apply方法, 省略了小括号
+apply 'plugin':'war'
+//def map = ['plugin': 'war']
+//apply map
+
+
+
+dependencies {
+    compile project(":repository")
+}

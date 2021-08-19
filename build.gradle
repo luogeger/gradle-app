@@ -1,16 +1,114 @@
-plugins {
-    id 'java'
+
+
+
+
+
+// 所有项目应用Java插件
+allprojects {
+    apply 'plugin':'java'
+    sourceCompatibility = 1.8
 }
 
-group 'com.first'
-version '1.0-SNAPSHOT'
+//  所有子项目添加logbook日志功能
+subprojects {
 
-sourceCompatibility = 1.8
+    repositories {
+        //  闭包里执行方法
+        mavenLocal()
+        mavenCentral()
+    }
 
-repositories {
-    mavenCentral()
+    //  配置依赖版本冲突策略
+    configurations.all{
+        resolutionStrategy{
+            // 修改 gradle不自动处理版本冲突
+            // failOnVersionConflict()
+            // 强行指定依赖版本
+            // force 'org.slf4j:slf4j-api:1.7.2'
+        }
+    }
+
+
+    dependencies {
+        // https://mvnrepository.com/artifact/org.projectlombok/lombok
+        compile group: 'org.projectlombok', name: 'lombok', version: '1.18.8'
+        implementation 'com.walterjwhite.java.dependencies:logback-classic:0.0.17'
+        implementation ('org.hibernate:hibernate-core:3.6.3.Final') {
+            // 排除传递性依赖
+            // exclude group:"org.slf4j", module:"slf4j-api"
+        }
+        // testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile 'junit:junit:4.12'
+    }
+
 }
 
-dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+def createDir = {
+    path ->
+        File user = new File(System.getProperty("user.dir"))
+        String fullPath = user.parent + '/' + user.name + '/' + path
+        File dir = new File(fullPath)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
 }
+
+task makeJavaDir() {
+    def paths = [
+            'src/main/java',
+            'src/main/resources',
+            'src/test/java',
+            'src/test/resources'
+    ]
+
+    //  方法的执行必须放在doFirst里
+    doFirst {
+        //  创建目录
+        paths.forEach(createDir)
+    }
+}
+
+task makeWebDir() {
+
+    dependsOn(makeJavaDir)
+
+    //  创建web项目特有的目录及文件
+    def web_inf = 'src/main/webapp/WEB-INF'
+    def paths = [
+            'src/main/webapp',
+            web_inf
+    ]
+
+    doLast {
+        //  创建目录
+        paths.forEach(createDir)
+        //  创建文件
+        File user = new File(System.getProperty("user.dir"))
+        String path = user.parent + '/' + user.name + '/' + web_inf + '/web.xml'
+        File file = new File(path)
+        file.createNewFile()
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
